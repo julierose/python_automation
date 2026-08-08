@@ -1,0 +1,4 @@
+pandas==3.0.5
+matplotlib==3.11.1
+seaborn==0.13.2
+python-pptx==1.0.2
