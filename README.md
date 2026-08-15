@@ -8,8 +8,8 @@ Each subfolder is a self-contained, runnable example: a script, a branded templa
  
 | Demo | Status | Description |
 |---|---|---|
-| [`pptx_automation/`](pptx_automation/) | Available | Automates branded PowerPoint deck generation — inserts a data-driven chart and a dynamic "last refreshed" text box into a template deck using python-pptx, pandas, and seaborn. |
-| `docx_automation/` | Coming soon | Automated Word document generation |
+| [`pptx_automation/`](pptx_automation/) | Available | Automates branded PowerPoint deck generation — creates and inserts a chart and a dynamic "last refreshed" text box into a template deck using python-pptx, pandas, and seaborn. |
+| [`docx_automation/`](docx_automation) | Available | 	Automates branded Word document generation — creates and embeds a chart, applies consistent heading/body styles, and demonstrates both style-based and manual text formatting using python-docx, pandas, and seaborn. |
 | `email_report_automation/` | Coming soon | Generates a report with Quarto, then converts it to a PNG for embedding directly in email bodies — sidesteps HTML stripping/formatting issues in email platforms like Gmail. |
  
 ## Why this exists
