@@ -1,0 +1,259 @@
+---
+title: "Monthly Indicators Report"
+format:
+    html:
+        minimal: true
+        theme: none
+        embed-resources: true
+        keep-ipynb: false    #deletes intermediate Jupyter notebook
+jupyter: python3
+---
+<style>
+body {
+    background-color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #333333;
+    line-height: 1.6;
+}
+
+/*center the title and subtitle*/
+#title-block-header {
+    text-align: center;
+}
+
+/*center the dynamic progress subtitle*/
+.centered-subtitle {
+    text-align: center;
+}
+
+/*style any outputs of code chunks, e.g. figures*/
+.cell-output-display img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/*style a table*/
+table {
+    border-collapse: collapse;
+    width: 50%;
+    margin-bottom: 20px;
+    border-top: 2px solid #dddddd;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+th, td {
+    border-bottom: 2px solid #dddddd;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+/*Ensure the div containers work */
+div {
+    display: block;
+}
+
+hr {
+    border: none;
+    border-top: 2px solid #dddddd;
+    width: 40%;
+    margin: 20px 0;
+}
+</style>
+```{python}
+#| include: false
+
+#import packages and data
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import matplotlib.transforms as transforms
+import seaborn as sns
+from IPython.display import display, HTML
+
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = ['Segoe UI', 'Arial', 'sans-serif']
+
+df = pd.read_csv("environmental_report_sample_data.csv", parse_dates=["date"])
+df_compare = pd.read_csv("bay_comparison.csv")
+
+report_date = pd.to_datetime('2025-03-01')
+report_date_str = report_date.strftime('%B %d, %Y')
+
+metric_at_report_date = df[df['date'] == report_date]['metric_value'].mean()
+goal = df['goal'].iloc[0]
+progress_pct = (metric_at_report_date / goal) * 100
+
+#set a dynamic status message based on week of month
+
+```
+
+## Progress as of `{python} report_date_str` {.centered-subtitle}
+
+```{python}
+#| echo: false
+#| fig-align: center
+
+fig, ax_main = plt.subplots()
+
+#actuals line
+sns.lineplot(data=df[df['date'] <= (report_date)],
+                x = 'date',
+                y = 'metric_value',
+                marker = 'o',
+                color = '#16a34a',
+                label = 'Measured',
+                zorder = 5,
+                ax = ax_main)
+
+#Projection line
+sns.lineplot(data = df[df['date'] >= (report_date)],
+                x = 'date',
+                y = 'projection',
+                linestyle = '--',
+                color = '#16a34a',
+                label = 'Projected',
+                zorder = 5,
+                ax = ax_main)
+
+ax_main.axhline(y = (df['goal'].iloc[0]), color = '#14532d', linewidth = 2, zorder = 1)
+
+#Full-axis vertical line indicating the day
+ax_main.axvline(x = (report_date), color = '#6c2b81', linewidth = 2, zorder = 1)
+
+#Annotations
+#convert x-axis into 0-1 to make text placement easier
+trans = transforms.blended_transform_factory(ax_main.transAxes, ax_main.transData)
+
+ax_main.text(
+    x = 0.01,
+    y = df['goal'].iloc[0] + 0.0075 * df['goal'].iloc[0],
+    s = 'Goal',
+    color = '#14532d',
+    fontsize = 12,
+    ha = 'left',
+    va = 'bottom',
+    transform = trans
+)
+
+#Main figure labels
+ax_main.set(
+    xlabel = "",
+    ylabel = "Environmental Indicator (count)"
+)
+#format x-axis date
+ax_main.xaxis.set_major_formatter(mdates.DateFormatter('%b-%y'))
+
+#set y-axis limit to zero
+ax_main.set_ylim(bottom = 0)
+
+ax_main.legend(
+    loc='lower left',
+    bbox_to_anchor = (0,0.975),
+    ncol=2,
+    frameon=False
+)
+
+#------------------------------------------
+#Inset Figure
+#-----------------------------------------
+ax_inset = ax_main.inset_axes([0.65, 0.055, 0.3, 0.35])
+ax_inset.set_facecolor('white') #ensures white background so vertical line in main figure falls behind
+
+#current progress to goal
+ax_inset.bar(
+    x = 0,
+    height = progress_pct,
+    color = '#6c2b81',
+    width = 0.6,
+    label = 'This Bay'
+)
+
+#current progress bar label
+ax_inset.text(
+    x = 0,
+    y = progress_pct,
+    s = f'{progress_pct:,.0f}%',
+    ha = 'center',
+    va = 'bottom',
+    fontsize = 9,
+    fontweight = 'bold',
+    color = 'black'
+)
+
+#vertical divider separating the report location from the comparison bays
+ax_inset.axvline(x = 0.5, color = '#dddddd', linewidth = 1, zorder = 1)
+
+#comparison bays
+bay_positions = range(1, len(df_compare) +1)  #automatically updates if data added in future
+ax_inset.bar(
+    x = bay_positions,
+    height = df_compare['progress'],
+    color = '#A0ABC2',
+    width = 0.6,
+    label = 'Comparison Bays'
+)
+
+#comparison bay labels
+for x, height in zip(bay_positions, df_compare['progress']):
+    ax_inset.text(
+        x = x,
+        y = height,
+        s = f"{height:,.0f}%",
+        ha = 'center',
+        va = 'bottom',
+        fontsize = 9,
+        fontweight = 'bold',
+        color = 'black'
+    )
+
+#x-axis report location first, then comparison bays
+ax_inset.set_xlim(-0.6, len(df_compare) + 0.6)
+ax_inset.set_xticks([0] + list(bay_positions))
+ax_inset.set_xticklabels(['This Bay'] + df_compare['bay'].tolist(), fontsize = 8)
+
+#set y axis limits to give padding for the bar labels
+max_val = max(progress_pct, df_compare['progress'].max())
+ax_inset.set_ylim(0, max_val * 1.15)
+ax_inset.set_yticks([])
+
+#set inset figure title
+ax_inset.set_title("Progress to Goal\nBay Comparison", fontsize = 10)
+
+plt.show()
+
+```
+
+```{python}
+#| echo: false
+
+summary_data = {
+    "Metric": ["Most Recent Count", "Goal", "Progress Towards Goal"],
+    "Value": [f"{metric_at_report_date:,.1f}", f"{goal:.0f}", f"{progress_pct:.0f}%"]
+}
+summary_df = pd.DataFrame(summary_data)
+
+styled_table = (
+    summary_df.style
+    .hide(axis='index')
+    .hide(axis='columns')
+    .set_properties(**{
+        'padding': '8px',
+        'text-align': 'left',
+        'font-family': 'Segoe UI, Arial, sans-serif'
+    })
+    .set_table_styles([
+        {'selector': 'table', 'props': [('border-collapse','collapse')]},
+        {'selector': 'thead', 'props': [('background-color', '#f2f2f2')]}
+    ])
+)
+display(HTML(styled_table.to_html()))
+```
