@@ -11,6 +11,10 @@ Each subfolder is a self-contained, runnable example: a script, a branded templa
 | [`pptx_automation/`](pptx_automation/) | Available | Automates branded PowerPoint deck generation. Creates and inserts a chart and a dynamic "last refreshed" text box into a template deck using python-pptx, pandas, and seaborn. |
 | [`docx_automation/`](docx_automation) | Available | 	Automates branded Word document generation. Creates and embeds a chart, applies consistent heading/body styles, and demonstrates both style-based and manual text formatting using python-docx, pandas, and seaborn. |
 | [`email_report_automation/`](email_report_automation) | Available | Generates a report with Quarto, then converts it to a PNG for embedding directly in email bodies. This approach sidesteps HTML stripping/formatting issues in email platforms like Gmail. |
+
+## Related project
+
+[`air-quality-analysis`](https://github.com/julierose/air-quality-analysis) (work in progress): An air quality dashboard that will demonstrate automated data and analysis updates. A daily GitHub Action will pull the data. A marimo notebook, hosted on GitHub Pages and running entirely in the browser, will illustrate geographic, temporal, and pollutant-based differences.
  
 ## Why this exists
  
