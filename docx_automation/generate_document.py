@@ -24,11 +24,11 @@ sns.boxplot(data = df_test,
             x = 'Region', 
             y = 'Observation', 
             ax = ax, 
-            color = '#16A34A')
+            color = '#8EA49A')
 
-ax.set(xlabel = 'Region',
-       ylabel = 'Observation', 
-       title = 'Test Plot: Regional Observations')
+ax.set(xlabel = '',
+       ylabel = 'Observation (count)', 
+       title = 'Distribution of Observations by Region')
 ax.set_ylim(bottom = 0)
 
 #plt.show()
@@ -64,7 +64,7 @@ heading1_style = doc.styles['Heading 1']
 heading1_style.font.name = 'Calibri'
 heading1_style.font.size = Pt(14)
 heading1_style.font.bold = True
-heading1_style.font.color.rgb = RGBColor.from_string('14532D') #the from_string allows you to use hex codes
+heading1_style.font.color.rgb = RGBColor.from_string('7D9AA6') #the from_string allows you to use hex codes
 
 heading2_style = doc.styles['Heading 2']
 heading2_style.font.name = 'Calibri'
@@ -83,34 +83,16 @@ today = pd.Timestamp.today()
 today_str = today.strftime("%B %d, %Y")
 
 #create sample section heading, date of last update, and normal text below the heading
-#APPROACH 1: using a predefined style (defined above) — best when you want consistent
 #formatting applied automatically, every time this style is used anywhere in the document
-doc.add_paragraph("Test Header", style='Heading 1')
+doc.add_paragraph("Regional Observations Summary", style='Heading 1')
 doc.add_paragraph(f'Data last refreshed on {today_str}', style='Heading 2')
-doc.add_paragraph("This is some sample text below the heading. You can add as many paragraphs as you want. This is just a placeholder for demonstration purposes.", style='Normal')
+doc.add_paragraph("This report uses synthetic data to illustrate differences in a measured environmental metric across regions.", style='Normal')
 
 #now add the image below the text
 doc.add_picture(temp_image_path, width = Inches(5))
 
 #then add some more text below the image
-doc.add_paragraph("Here is some default explanatory text below the image. You can add as many paragraphs as you want.")
-
-#insert a page break so Approach 2 starts on its own page
-#this also demonstrates that the header image repeats correctly across every page
-doc.add_page_break()
-
-#APPROACH 2 manual formatting using .add_run() — best when you want one-off formatting
-#that doesn't belong to a reusable style, e.g. emphasizing a single word or a unique callout
-#Note the three-step pattern: create the paragraph, add a run (text container), then format the run
-
-#if you want plain text with just default formatting, use this code
-#docx.add_paragraph("My text here")
-
-callout_para = doc.add_paragraph()
-callout_run = callout_para.add_run('Note: this paragraph is formatted manually rather than by style.')
-callout_run.bold = True
-callout_run.font.size = Pt(12)
-callout_run.font.color.rgb = RGBColor.from_string('14532D')
+doc.add_paragraph("In the figure above, the eastern region has the highest median value, and also the largest variability in observed values. The southern region had the lowest median value and the narrowest range of observed values.")
 
 #save the document to the repo
 output_filename = os.path.join(script_dir, 'Sample_Document.docx')
