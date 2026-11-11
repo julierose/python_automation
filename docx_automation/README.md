@@ -5,13 +5,12 @@ A demonstration of automating branded Word document creation using [python-docx]
 ## What it does
 
 1. Builds a sample dataset with pandas and creates a boxplot with seaborn.
-2. Saves the chart to a temporary file (never committed to the repo).
-3. Opens `Sample_Document_Template.docx` — a pre-branded Word template with a header image already in place.
-4. Sets document-level styles (Heading 1, Heading 2, Normal) for consistent formatting throughout.
-5. Adds a heading, a "last refreshed" date, and body text using named styles (**Approach 1**).
-6. Embeds the chart image below that text.
-7. Inserts a page break, then adds a manually-formatted callout paragraph using `.add_run()` (**Approach 2**) — demonstrating one-off formatting outside the style system, and proving the header repeats correctly across pages.
-8. Saves the result as `Sample_Document_Updated.docx`.
+2. Saves the chart to a temporary file.
+3. Opens `Sample_Document_Template.docx` — a pre-branded Word template.
+4. Sets document-level styles for headings and body text to ensure consistent formatting throughout.
+5. Adds a heading, data refresh date, and explanatory text using the defined styles.
+6. Embeds the generated chart and adds accompanying interpretation.
+7. Saves the completed document as `Sample_Document.docx`.
 
 ## Requirements
 
@@ -56,6 +55,14 @@ This script is meant as a starting point. Common things to adjust:
 - **Heading/body styles**: adjust the `heading1_style`, `heading2_style`, and `normal_style` blocks near the top of the script
 - **Chart size**: adjust the `width` passed to `doc.add_picture(...)`
 - **Template and header**: swap in your own branded `.docx` file with your own header image built in (see template requirements above)
+- **One-off text formatting:** Use `.add_run()` when individual words or phrases need formatting that differs from the document's predefined paragraph styles. For example:
+
+  ```python
+  callout_para = doc.add_paragraph()
+  callout_run = callout_para.add_run("Important note:")
+  callout_run.bold = True
+  callout_run.font.color.rgb = RGBColor.from_string("14532D")
+  ```
 
 ## Files in this folder
 
